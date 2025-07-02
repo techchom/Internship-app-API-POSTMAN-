@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internship Portal</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-primary">
+        <a class="navbar-brand text-white" href="#">Internship Portal</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/apply">Apply for an Internship</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h2>Apply for an Internship</h2>
+        <form id="apply-form" class="needs-validation" novalidate>
+            <div class="form-group">
+                <label for="student">Your Name</label>
+                <input type="text" id="student" class="form-control" placeholder="Enter your name" required>
+                <div class="invalid-feedback">
+                    Please provide your name.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="internship-title">Select Internship</label>
+                <select id="internship-title" class="form-control" required>
+                    <option value="">Loading internships...</option>
+                </select>
+                <div class="invalid-feedback">
+                    Please select an internship.
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Apply</button>
+        </form>
+    </div>
+
+    <footer class="bg-light text-center py-3 mt-5">
+        <p>&copy; 2025 Internship Portal | All Rights Reserved</p>
+    </footer>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        async function loadInternshipsForApply() {
+            try {
+                let response = await fetch('http://127.0.0.1:5000/api/internships');
+                if (!response.ok) throw new Error('Network response was not ok');
+                let data = await response.json();
+                console.log('Internships Data:', data);  // Log the response data
+                let internshipSelect = document.getElementById('internship-title');
+                if (data.internships.length === 0) {
+                    let option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = 'No internships available';
+                    internshipSelect.appendChild(option);
+                    return;
+                }
+                data.internships.forEach(internship => {
+                    let option = document.createElement('option');
+                    option.value = internship.title;
+                    option.textContent = `${internship.title} - ${internship.company}`;
+                    internshipSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading internships:', error);
+                alert('There was an issue loading the internships. Please try again later.');
+            }
+        }
+
+        window.onload = function () {
+            document.getElementById('apply-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                let application = {
+                    student: document.getElementById('student').value,
+                    internship_title: document.getElementById('internship-title').value
+                };
+
+                let response = await fetch('http://127.0.0.1:5000/api/apply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(application)
+                });
+
+                let result = await response.json();
+                alert(result.message);
+            });
+        };
+
+        // Load internships for the dropdown when the page loads
+        window.onload = loadInternshipsForApply;
+    </script>
+</body>
+</html>
