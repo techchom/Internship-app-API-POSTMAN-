@@ -2,6 +2,23 @@
 
 A RESTful API for managing internships using Flask, SQLAlchemy, and Flask-RESTful with JWT authentication.
 
+venv\Scripts\activate
+
+python app.py
+
+# Unit tests
+python -m unittest tests.test_unit
+
+# Integration tests  
+python -m unittest tests.test_integration -v
+
+# System tests
+python -m unittest tests.test_system -v
+
+# All tests
+python -m unittest discover tests -v
+
+
 ## Features
 
 - User registration and authentication with JWT
